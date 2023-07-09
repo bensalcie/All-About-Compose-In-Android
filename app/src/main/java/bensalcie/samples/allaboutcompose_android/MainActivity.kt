@@ -2,16 +2,27 @@ package bensalcie.samples.allaboutcompose_android
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.main_activity)
-        fragmentManager.beginTransaction()
-            .replace(R.id.main_container,RecipeListFragment())
-            .commit()
 
+        //Nothing required here as Navigation components will handle that.
+
+
+
+
+
+
+
+        // Testing views system
+//        setContentView(R.layout.main_activity)
+//        fragmentManager.beginTransaction()
+//            .replace(R.id.main_container,RecipeListFragment())
+//            .commit()
+//
 
 
 
