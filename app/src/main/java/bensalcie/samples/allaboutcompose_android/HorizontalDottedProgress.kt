@@ -1,4 +1,4 @@
-package com.codingwithmitch.foodrecipes.util
+package bensalcie.samples.allaboutcompose_android
 
 import android.content.Context
 import android.graphics.Canvas
@@ -39,8 +39,7 @@ class HorizontalDottedProgress : View {
         super.onDraw(canvas)
         val paint = Paint()
 
-        //set the color for the dot that you want to draw
-        paint.color = Color.parseColor("#fd583f")
+        paint.color = Color.parseColor("#c2c2c2")
 
         //function to create dot
         createDot(canvas, paint)
