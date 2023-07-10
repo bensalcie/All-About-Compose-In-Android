@@ -1,13 +1,48 @@
 package bensalcie.samples.allaboutcompose_android
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import bensalcie.samples.allaboutcompose_android.network.model.RecipeService
+import com.google.gson.GsonBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+    @Inject
+    lateinit var someRandomString :String
+
+    @Inject
+    lateinit var app:BaseApplication
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+
+
+        val service = Retrofit.Builder()
+            .baseUrl("https://food2fork.ca/api/recipe/")
+            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+            .build().create(RecipeService::class.java)
+        CoroutineScope(IO).launch {
+            val recipe = service.get("Token 9c8b06d329136da358c2d00e76946b0111ce2c48",id = 583)
+            Log.d("MainActivity", "onCreate: response ${recipe.title}")
+            Log.d("MainActivity", "onCreate: string $someRandomString")
+            Log.d("MainActivity", "onCreate: string $app")
+
+
+
+        }
+
+//        val mapper = RecipeDtoMapper()
+//        val recipe = Recipe()
+//        val networkEntity = mapper.mapToEntity(recipe)
+//        val r = mapper.mapFromEntity(networkEntity)
 
         //Nothing required here as Navigation components will handle that.
 
