@@ -83,6 +83,8 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
 
+    def glide_version ="1.0.0-alpha.1"
+    implementation "com.github.bumptech.glide:compose:$glide_version"
 
 
 }

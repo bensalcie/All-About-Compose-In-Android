@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/recipeListFragment"
-        android:name="bensalcie.samples.allaboutcompose_android.RecipeListFragment"
+        android:name="bensalcie.samples.allaboutcompose_android.presentation.ui.recipe.recipelist.RecipeListFragment"
         android:label="RecipeListFragment" >
         <action
             android:id="@+id/action_recipeListFragment_to_recipeFragment"
@@ -15,6 +15,6 @@
 
     <fragment
         android:id="@+id/recipeFragment"
-        android:name="bensalcie.samples.allaboutcompose_android.RecipeFragment"
+        android:name="bensalcie.samples.allaboutcompose_android.presentation.ui.recipe.RecipeFragment"
         android:label="RecipeFragment" />
 </navigation>
