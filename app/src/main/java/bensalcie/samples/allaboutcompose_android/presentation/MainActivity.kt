@@ -1,8 +1,9 @@
-package bensalcie.samples.allaboutcompose_android
+package bensalcie.samples.allaboutcompose_android.presentation
 
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import bensalcie.samples.allaboutcompose_android.R
 import bensalcie.samples.allaboutcompose_android.network.model.RecipeService
 import com.google.gson.GsonBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -15,29 +16,24 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    @Inject
-    lateinit var someRandomString :String
-
-    @Inject
-    lateinit var app:BaseApplication
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
 
-        val service = Retrofit.Builder()
-            .baseUrl("https://food2fork.ca/api/recipe/")
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-            .build().create(RecipeService::class.java)
-        CoroutineScope(IO).launch {
-            val recipe = service.get("Token 9c8b06d329136da358c2d00e76946b0111ce2c48",id = 583)
-            Log.d("MainActivity", "onCreate: response ${recipe.title}")
-            Log.d("MainActivity", "onCreate: string $someRandomString")
-            Log.d("MainActivity", "onCreate: string $app")
-
-
-
-        }
+//        val service = Retrofit.Builder()
+//            .baseUrl("https://food2fork.ca/api/recipe/")
+//            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+//            .build().create(RecipeService::class.java)
+//        CoroutineScope(IO).launch {
+//            val recipe = service.get("Token 9c8b06d329136da358c2d00e76946b0111ce2c48",id = 583)
+//            Log.d("MainActivity", "onCreate: response ${recipe.title}")
+//            Log.d("MainActivity", "onCreate: string $someRandomString")
+//            Log.d("MainActivity", "onCreate: string $app")
+//
+//
+//
+//        }
 
 //        val mapper = RecipeDtoMapper()
 //        val recipe = Recipe()
