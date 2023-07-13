@@ -85,6 +85,9 @@ dependencies {
 
     def glide_version ="1.0.0-alpha.1"
     implementation "com.github.bumptech.glide:compose:$glide_version"
+    def constraint_layout_version ="1.0.1"
+    implementation "androidx.constraintlayout:constraintlayout-compose:$constraint_layout_version"
+
 
 
 }
