@@ -11,6 +11,7 @@ import bensalcie.samples.allaboutcompose_android.domain.model.Recipe
 import bensalcie.samples.allaboutcompose_android.repository.RecipeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -30,16 +31,23 @@ class RecipeListViewModel @Inject constructor(
 
     val selectedCategory :MutableState<FoodCategory?> = mutableStateOf(null)
 
-    var categoryScrollPosition :Float = 0f
+    var categoryScrollPosition :Int = 0
+    var loading = mutableStateOf(false)
 
     var query = mutableStateOf("")
 init {
   newSearch()
 }
      fun newSearch(){
+         loading.value = true
+         resetSearchState()
         viewModelScope.launch {
+            delay(2000)
+
             val result =  repository.search(token = token, page = 1, query = query.value)
             recipes.value = result
+            loading.value= false
+
         }
     }
 
@@ -52,9 +60,20 @@ init {
         selectedCategory.value = newCategory
         onQueryChange(category)
     }
-fun onChangeScrollPosition(position:Float){
+fun onChangeScrollPosition(position:Int){
     this.categoryScrollPosition = position
 }
+
+    private fun resetSearchState(){
+        recipes.value = listOf()
+        if (selectedCategory.value?.value!=query.value)
+            clearSelectedCategory()
+
+    }
+    private fun clearSelectedCategory(){
+        this.selectedCategory.value =null
+
+    }
 
 //    init {
 //
