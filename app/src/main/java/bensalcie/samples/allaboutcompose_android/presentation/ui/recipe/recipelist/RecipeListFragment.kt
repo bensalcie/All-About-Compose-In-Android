@@ -1,5 +1,6 @@
 package bensalcie.samples.allaboutcompose_android.presentation.ui.recipe.recipelist
 
+import android.annotation.SuppressLint
 import android.graphics.drawable.Icon
 import android.os.Bundle
 import android.provider.SyncStateContract
@@ -9,6 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -22,9 +26,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActionScope
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Create
@@ -42,12 +49,14 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
@@ -64,6 +73,7 @@ import bensalcie.samples.allaboutcompose_android.presentation.components.FoodCat
 import bensalcie.samples.allaboutcompose_android.presentation.components.RecipeCard
 import bensalcie.samples.allaboutcompose_android.utils.DEBUG_TAG
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class RecipeListFragment : androidx.fragment.app.Fragment() {
@@ -78,6 +88,7 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 //        Log.d("ViewModel", "token ${viewModel.getToken()}")
 //        Log.d("ViewModel", "repository ${viewModel.getRepository()}")
 //    }
+    @SuppressLint("CoroutineCreationDuringComposition")
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,7 +105,7 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 
                 val selectedCategory = viewModel.selectedCategory.value
                 val query = viewModel.query.value //Maintain configuration changes.
-                Column (horizontalAlignment = Alignment.CenterHorizontally){
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
                     Surface(
                         shadowElevation = 8.dp,
@@ -103,9 +114,13 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 
                     ) {
 
-
                         Column {
-                            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
 
                                 TextField(
                                     value = query,
@@ -122,10 +137,12 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                                     ),
 
 
-                                    leadingIcon = { Icon(
-                                        imageVector = Icons.Default.Search,
-                                        contentDescription = "Search"
-                                    ) },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Search,
+                                            contentDescription = "Search"
+                                        )
+                                    },
 
 
                                     keyboardActions = KeyboardActions(onSearch =
@@ -142,19 +159,32 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 
 
                             }
+                            val scrollState = rememberLazyListState()
+
+                            val scope = rememberCoroutineScope()
+
+                            scope.launch { scrollState.animateScrollToItem(viewModel.categoryScrollPosition.toInt()) }
+
+
                             //Scrollable Row
-                            LazyRow(modifier = Modifier.fillMaxWidth().padding(start = 8.dp, bottom = 8.dp)) {
+                            LazyRow(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+
+                                    .padding(start = 8.dp, bottom = 8.dp)
+                            , state = scrollState
+                            ) {
                                 itemsIndexed(items = getAllFoodCategories()) {
 
-                                        _, item ->
+                                        index, item ->
                                     FoodCategoryChip(
                                         category = item.value,
                                         isSelected = selectedCategory == item,
                                         onExecuteSearch = viewModel::newSearch,
                                         onSelectedCategoryChanged = {
                                             viewModel.onSelectedCategoryChanged(it)
+                                            viewModel.onChangeScrollPosition(index.toFloat())
                                         })
-
 
 
 //                                  Text(
