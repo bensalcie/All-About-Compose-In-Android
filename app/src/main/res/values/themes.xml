@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.AllAboutComposeAndroid" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.AllAboutComposeAndroid" parent="android:Theme.Material.NoActionBar" >
+        <item name="android:colorPrimary">@color/blue_500</item>
+        <item name="colorPrimaryVariant">@color/blue_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:statusBarColor">@color/blue_800</item>
+    </style>
+
 </resources>
