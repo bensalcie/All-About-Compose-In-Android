@@ -11,8 +11,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Build
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -27,6 +32,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import bensalcie.samples.allaboutcompose_android.presentation.ui.recipe.recipelist.FoodCategory
 import bensalcie.samples.allaboutcompose_android.presentation.ui.recipe.recipelist.getAllFoodCategories
 import kotlinx.coroutines.launch
@@ -40,7 +46,8 @@ fun SearchAppBar(
     scrollPosition: Int,
     selectedCategory: FoodCategory?,
     onSelectedCategoryChanged: (String) -> Unit,
-    onChangeScrollPosition: (Int) -> Unit
+    onChangeScrollPosition: (Int) -> Unit,
+    ontoggleTheme:()->Unit
 
 ) {
 
@@ -68,7 +75,7 @@ fun SearchAppBar(
                     value = query,
                     modifier = Modifier
                         .fillMaxWidth(
-
+                            0.9f
                         )
                         .padding(8.dp),
                     label = { Text(text = "Search") },
@@ -99,6 +106,24 @@ fun SearchAppBar(
 
                     onValueChange = { newValue -> onQueryChanged(newValue) })
 
+
+
+                ConstraintLayout(modifier = Modifier.align(Alignment.CenterVertically)) {
+                    val menu = createRef()
+                    IconButton(onClick = ontoggleTheme, modifier = Modifier.constrainAs(menu) {
+                        end.linkTo(parent.end)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+
+
+
+                    }) {
+
+                        Icon(Icons.Outlined.Build, contentDescription = "Test")
+
+
+                    }
+                }
 
             }
             LaunchedEffect("scroll-effect") {

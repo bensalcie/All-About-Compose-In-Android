@@ -31,14 +31,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import bensalcie.samples.allaboutcompose_android.presentation.BaseApplication
 import bensalcie.samples.allaboutcompose_android.presentation.components.CircularIndeterminateProgressBar
 import bensalcie.samples.allaboutcompose_android.presentation.components.RecipeCard
 import bensalcie.samples.allaboutcompose_android.presentation.components.SearchAppBar
+import bensalcie.samples.allaboutcompose_android.ui.theme.AllAboutComposeAndroidTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class RecipeListFragment : androidx.fragment.app.Fragment() {
     private val viewModel by viewModels<RecipeListViewModel>()
+    @Inject
+    lateinit var application: BaseApplication
 
     @SuppressLint("CoroutineCreationDuringComposition")
     override fun onCreateView(
@@ -50,28 +55,31 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-
-                val recipes = viewModel.recipes.value
-
-                val selectedCategory = viewModel.selectedCategory.value
-                val query = viewModel.query.value //Maintain configuration changes.
-                val isLoading = viewModel.loading.value
+                AllAboutComposeAndroidTheme(darkTheme = application.isDark.value) {
 
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    //AppBar.
+                    val recipes = viewModel.recipes.value
 
-                    SearchAppBar(
-                        query = query,
-                        onQueryChanged = viewModel::onQueryChange,
-                        onExecuteSearch = viewModel::newSearch,
-                        selectedCategory = selectedCategory,
-                        scrollPosition = viewModel.categoryScrollPosition,
-                        onSelectedCategoryChanged = viewModel::onSelectedCategoryChanged,
-                        onChangeScrollPosition = viewModel::onChangeScrollPosition
-                    )
+                    val selectedCategory = viewModel.selectedCategory.value
+                    val query = viewModel.query.value //Maintain configuration changes.
+                    val isLoading = viewModel.loading.value
 
 
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        //AppBar.
+
+                        SearchAppBar(
+                            query = query,
+                            onQueryChanged = viewModel::onQueryChange,
+                            onExecuteSearch = viewModel::newSearch,
+                            selectedCategory = selectedCategory,
+                            scrollPosition = viewModel.categoryScrollPosition,
+                            onSelectedCategoryChanged = viewModel::onSelectedCategoryChanged,
+                            onChangeScrollPosition = viewModel::onChangeScrollPosition,
+                            ontoggleTheme ={
+                                application.toggleLightTheme()
+                            }
+                        )
 
 
 
@@ -79,47 +87,44 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 
 
 
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        if(isLoading){
-                            LazyColumn {
 
-                                /*
+
+                        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                            if (isLoading) {
+                                LazyColumn {
+
+                                    /*
                                   Lay down the Shimmer Animated item 5 time
                                   [repeat] is like a loop which executes the body
                                   according to the number specified
                                 */
-                                repeat(5) {
-                                    item {
-                                        ShimmerCardLayout(cardHeight = 250.dp)
+                                    repeat(5) {
+                                        item {
+                                            ShimmerCardLayout(cardHeight = 250.dp)
+                                        }
                                     }
                                 }
-                            }
-                        }else{
+                            } else {
 
 
-                            LazyColumn {
+                                LazyColumn {
 
 
-                                itemsIndexed(items = recipes) { _, item ->
-                                    RecipeCard(recipe = item, onclick = {})
+                                    itemsIndexed(items = recipes) { _, item ->
+                                        RecipeCard(recipe = item, onclick = {})
+                                    }
+
                                 }
-
                             }
+
                         }
+                        CircularIndeterminateProgressBar(
+                            isDisplayed = isLoading,
+                            verticalBias = 0.3f
+                        )
+
 
                     }
-                    CircularIndeterminateProgressBar(isDisplayed = isLoading, verticalBias = 0.3f)
-
-
-
-
-
-
-
-
-
-
-
                 }
 
 
