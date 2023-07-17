@@ -1,23 +1,35 @@
 package bensalcie.samples.allaboutcompose_android.presentation.ui.recipe.recipelist
 
+import ShimmerCardLayout
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush.Companion.linearGradient
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import bensalcie.samples.allaboutcompose_android.presentation.components.CircularIndeterminateProgressBar
 import bensalcie.samples.allaboutcompose_android.presentation.components.RecipeCard
@@ -63,16 +75,47 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 
 
 
-                    CircularIndeterminateProgressBar(isDisplayed = isLoading)
-
-                    LazyColumn {
 
 
-                        itemsIndexed(items = recipes) { _, item ->
-                            RecipeCard(recipe = item, onclick = {})
+
+
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        if(isLoading){
+                            LazyColumn {
+
+                                /*
+                                  Lay down the Shimmer Animated item 5 time
+                                  [repeat] is like a loop which executes the body
+                                  according to the number specified
+                                */
+                                repeat(5) {
+                                    item {
+                                        ShimmerCardLayout(cardHeight = 250.dp)
+                                    }
+                                }
+                            }
+                        }else{
+
+
+                            LazyColumn {
+
+
+                                itemsIndexed(items = recipes) { _, item ->
+                                    RecipeCard(recipe = item, onclick = {})
+                                }
+
+                            }
                         }
 
                     }
+                    CircularIndeterminateProgressBar(isDisplayed = isLoading, verticalBias = 0.3f)
+
+
+
+
+
+
+
 
 
 
@@ -168,3 +211,4 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 //        }
     }
 }
+

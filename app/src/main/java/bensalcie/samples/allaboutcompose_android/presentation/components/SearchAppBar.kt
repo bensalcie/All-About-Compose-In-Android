@@ -50,6 +50,7 @@ fun SearchAppBar(
         color = Color.White
 
     ) {
+
         val keyboardController = LocalSoftwareKeyboardController.current
         val scrollState = rememberLazyListState()
 
