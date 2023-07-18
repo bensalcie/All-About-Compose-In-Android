@@ -2,26 +2,49 @@ package bensalcie.samples.allaboutcompose_android.presentation.ui.recipe.recipel
 
 import ShimmerCardLayout
 import android.annotation.SuppressLint
+import android.graphics.Paint.Style
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -29,23 +52,31 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush.Companion.linearGradient
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import bensalcie.samples.allaboutcompose_android.presentation.BaseApplication
 import bensalcie.samples.allaboutcompose_android.presentation.components.CircularIndeterminateProgressBar
 import bensalcie.samples.allaboutcompose_android.presentation.components.RecipeCard
 import bensalcie.samples.allaboutcompose_android.presentation.components.SearchAppBar
 import bensalcie.samples.allaboutcompose_android.ui.theme.AllAboutComposeAndroidTheme
+import com.google.android.material.bottomnavigation.BottomNavigationItemView
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class RecipeListFragment : androidx.fragment.app.Fragment() {
     private val viewModel by viewModels<RecipeListViewModel>()
+
     @Inject
     lateinit var application: BaseApplication
 
-    @SuppressLint("CoroutineCreationDuringComposition")
+    @OptIn(ExperimentalMaterial3Api::class)
+    @SuppressLint("CoroutineCreationDuringComposition", "UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -54,7 +85,42 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 
 
         return ComposeView(requireContext()).apply {
+
+
             setContent {
+
+
+
+                //Example showing how to display snackbar
+
+//                val isShowing = remember {
+//                    mutableStateOf(true)
+//                }
+//
+//                val snackbarHostState = remember {
+//                    SnackbarHostState()
+//                }
+//
+//                Column {
+//                    Button(onClick = {
+//                       lifecycleScope.launch {
+//                           snackbarHostState.showSnackbar(
+//                               message = "Hey this is a snackbar",
+//                               duration = SnackbarDuration.Short,
+//                               actionLabel = "Dismiss",
+//                           )
+//                       }
+//                    }) {
+//                        Text(text = "Show Snackbar")
+//                    }
+//                    DecoupledSnackbarDemo(snackbarHostState = snackbarHostState)
+//                    SnackbarDemo(
+//                        isShowing = isShowing.value,
+//                        onHideSnackbar = { isShowing.value = false })
+
+                //}
+
+
                 AllAboutComposeAndroidTheme(darkTheme = application.isDark.value) {
 
 
@@ -65,31 +131,36 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                     val isLoading = viewModel.loading.value
 
 
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        //AppBar.
+                    Scaffold(
+                        topBar = {
+                            SearchAppBar(
+                                query = query,
+                                onQueryChanged = viewModel::onQueryChange,
+                                onExecuteSearch = viewModel::newSearch,
+                                selectedCategory = selectedCategory,
+                                scrollPosition = viewModel.categoryScrollPosition,
+                                onSelectedCategoryChanged = viewModel::onSelectedCategoryChanged,
+                                onChangeScrollPosition = viewModel::onChangeScrollPosition,
+                                ontoggleTheme = {
+                                    application.toggleLightTheme()
+                                }
+                            )
+                        },
+//                        bottomBar = {
+//                            MyBottomBar()
+//
+//
+//                        },
 
-                        SearchAppBar(
-                            query = query,
-                            onQueryChanged = viewModel::onQueryChange,
-                            onExecuteSearch = viewModel::newSearch,
-                            selectedCategory = selectedCategory,
-                            scrollPosition = viewModel.categoryScrollPosition,
-                            onSelectedCategoryChanged = viewModel::onSelectedCategoryChanged,
-                            onChangeScrollPosition = viewModel::onChangeScrollPosition,
-                            ontoggleTheme ={
-                                application.toggleLightTheme()
-                            }
-                        )
+                        ) {
 
 
-
-
-
-
-
-
-
-                        Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 130.dp)
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.surface)
+                        ) {
                             if (isLoading) {
                                 LazyColumn {
 
@@ -125,6 +196,8 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 
 
                     }
+
+
                 }
 
 
@@ -216,4 +289,86 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 //        }
     }
 }
+//Bottom bar example
+//@Composable
+//fun MyBottomBar() {
+//    BottomAppBar(tonalElevation = 14.dp) {
+//        NavigationBarItem(selected = true, onClick = { }, icon = {
+//            Icon(
+//                imageVector = Icons.Default.Home,
+//                contentDescription = "Home"
+//            )
+//        })
+//        NavigationBarItem(selected = false, onClick = { }, icon = {
+//            Icon(
+//                imageVector = Icons.Default.PlayArrow,
+//                contentDescription = "Play"
+//            )
+//        })
+//        NavigationBarItem(selected = false, onClick = { }, icon = {
+//            Icon(
+//                imageVector = Icons.Default.Person,
+//                contentDescription = "Profile"
+//            )
+//        })
+//
+//
+//    }
+//}
 
+
+@Composable
+fun DecoupledSnackbarDemo(snackbarHostState: SnackbarHostState) {
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val snacbar = createRef()
+        SnackbarHost(modifier = Modifier.constrainAs(snacbar) {
+            start.linkTo(parent.start)
+            bottom.linkTo(parent.bottom)
+            end.linkTo(parent.end)
+        },
+
+            hostState = snackbarHostState,
+            snackbar = {
+                Snackbar(action = {
+                    TextButton(onClick = { snackbarHostState.currentSnackbarData?.dismiss() }) {
+                        Text(text = "Dismiss", style = TextStyle(color = Color.White))
+                    }
+                }) {
+                    Text(
+                        text = "Click me",
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+
+                }
+            }
+
+        )
+
+    }
+}
+
+@Composable
+fun SnackbarDemo(onHideSnackbar: () -> Unit, isShowing: Boolean) {
+
+    if (isShowing) {
+        ConstraintLayout() {
+            val snacbar = createRef()
+            Snackbar(modifier = Modifier.constrainAs(snacbar) {
+                start.linkTo(parent.start)
+                bottom.linkTo(parent.bottom)
+                end.linkTo(parent.end)
+            }, action = {
+                Text(
+                    text = "Click me",
+                    modifier = Modifier.clickable { onHideSnackbar() },
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }) {
+
+                Text(text = "Hey look a snackbar")
+
+            }
+
+        }
+    }
+}
