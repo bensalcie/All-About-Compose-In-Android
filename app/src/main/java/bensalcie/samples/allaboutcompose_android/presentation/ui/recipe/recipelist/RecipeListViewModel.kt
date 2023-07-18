@@ -14,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -43,20 +44,19 @@ class RecipeListViewModel @Inject constructor(
     var query = mutableStateOf("")
 
     init {
-        newSearch()
+        onTriggerEvent(RecipeListEvent.NewSearchEvent)
     }
 
-    fun newSearch() {
+    private suspend fun newSearch() {
         loading.value = true
         resetSearchState()
-        viewModelScope.launch {
             delay(2000)
 
             val result = repository.search(token = token, page = 1, query = query.value)
             recipes.value = result
             loading.value = false
 
-        }
+
     }
 
     fun onQueryChange(query: String) {
@@ -86,8 +86,29 @@ class RecipeListViewModel @Inject constructor(
         this.recipes.value = current
     }
 
-     fun nextPage() {
+    fun onTriggerEvent(event:RecipeListEvent){
         viewModelScope.launch {
+            try {
+
+                when(event){
+                    is RecipeListEvent.NewSearchEvent->{
+                        newSearch()
+
+                    }
+
+                    is RecipeListEvent.NextPageEvent->{
+                        nextPage()
+
+                    }
+                }
+
+            }catch (e:Exception){
+                Log.d(DEBUG_TAG, "onTriggerEvent: $event , cause ${e.cause} ")
+            }
+        }
+    }
+
+   private suspend  fun nextPage() {
             //Prevent duplication due to recomposition.
             if ((recipeListScrolPosition + 1) >=  (page.value * PAGE_SIZE)) {
                 loading.value = true
@@ -103,7 +124,7 @@ class RecipeListViewModel @Inject constructor(
                     appendRecipes(results)
                 }
                 loading.value = false
-            }
+
         }
     }
 
