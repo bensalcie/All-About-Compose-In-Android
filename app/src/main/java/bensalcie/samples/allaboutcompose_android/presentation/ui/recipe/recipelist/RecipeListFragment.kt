@@ -173,7 +173,9 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                             SearchAppBar(
                                 query = query,
                                 onQueryChanged = viewModel::onQueryChange,
-                                onExecuteSearch = viewModel::newSearch,
+                                onExecuteSearch = {
+                                    viewModel.onTriggerEvent(RecipeListEvent.NewSearchEvent)
+                                },
                                 selectedCategory = selectedCategory,
                                 scrollPosition = viewModel.categoryScrollPosition,
                                 onSelectedCategoryChanged = viewModel::onSelectedCategoryChanged,
@@ -235,7 +237,7 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                                             index, item ->
                                         viewModel.onChangeRecipeScrollPosition(index)
                                         if((index+1)>=page* PAGE_SIZE &&!isLoading){
-                                            viewModel.nextPage()
+                                            viewModel.onTriggerEvent(RecipeListEvent.NextPageEvent)
                                         }
                                         RecipeCard(recipe = item, onclick = {})
                                     }
