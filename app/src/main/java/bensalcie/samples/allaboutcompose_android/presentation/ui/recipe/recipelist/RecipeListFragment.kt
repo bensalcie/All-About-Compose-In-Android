@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,6 +41,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -90,7 +93,6 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
             setContent {
 
 
-
                 //Example showing how to display snackbar
 
 //                val isShowing = remember {
@@ -129,9 +131,44 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                     val selectedCategory = viewModel.selectedCategory.value
                     val query = viewModel.query.value //Maintain configuration changes.
                     val isLoading = viewModel.loading.value
+                    val snackbarHostState = remember { SnackbarHostState() }
+                    val page = viewModel.page.value
 
 
                     Scaffold(
+                        snackbarHost = {
+                            // reuse default SnackbarHost to have default animation and timing handling
+                            SnackbarHost(snackbarHostState) { data ->
+                                // custom snackbar with the custom action button color and border
+                                val isError =
+                                    (data.visuals as? SnackbarVisualsWithError)?.isError ?: false
+                                val buttonColor = if (isError) {
+                                    ButtonDefaults.textButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                                        contentColor = MaterialTheme.colorScheme.error
+                                    )
+                                } else {
+                                    ButtonDefaults.textButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.inversePrimary
+                                    )
+                                }
+
+                                Snackbar(
+                                    modifier = Modifier
+                                        .border(2.dp, MaterialTheme.colorScheme.secondary)
+                                        .padding(12.dp),
+                                    action = {
+                                        TextButton(
+                                            onClick = { if (isError) data.dismiss() else data.performAction() },
+                                            colors = buttonColor
+                                        ) { Text(data.visuals.actionLabel ?: "") }
+                                    }
+                                ) {
+                                    Text(data.visuals.message)
+                                }
+                            }
+                        },
+
                         topBar = {
                             SearchAppBar(
                                 query = query,
@@ -143,16 +180,29 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                                 onChangeScrollPosition = viewModel::onChangeScrollPosition,
                                 ontoggleTheme = {
                                     application.toggleLightTheme()
+
+                                    val mode = when(application.isDark.value){
+                                        true->"Dark"
+                                        else->"Light"
+                                    }
+                                    lifecycleScope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "Hurrey, you changed to $mode theme",
+                                            actionLabel = "Dismiss",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
                                 }
                             )
                         },
+
 //                        bottomBar = {
 //                            MyBottomBar()
 //
 //
 //                        },
 
-                        ) {
+                    ) {
 
 
                         Box(
@@ -161,7 +211,7 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                                 .fillMaxSize()
                                 .background(MaterialTheme.colorScheme.surface)
                         ) {
-                            if (isLoading) {
+                            if (isLoading && recipes.isEmpty()) {
                                 LazyColumn {
 
                                     /*
@@ -181,7 +231,12 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                                 LazyColumn {
 
 
-                                    itemsIndexed(items = recipes) { _, item ->
+                                    itemsIndexed(items = recipes) {
+                                            index, item ->
+                                        viewModel.onChangeRecipeScrollPosition(index)
+                                        if((index+1)>=page* PAGE_SIZE &&!isLoading){
+                                            viewModel.nextPage()
+                                        }
                                         RecipeCard(recipe = item, onclick = {})
                                     }
 
@@ -345,6 +400,18 @@ fun DecoupledSnackbarDemo(snackbarHostState: SnackbarHostState) {
         )
 
     }
+}
+
+class SnackbarVisualsWithError(
+    override val message: String,
+    val isError: Boolean
+) : SnackbarVisuals {
+    override val actionLabel: String
+        get() = if (isError) "Error" else "OK"
+    override val withDismissAction: Boolean
+        get() = false
+    override val duration: SnackbarDuration
+        get() = SnackbarDuration.Indefinite
 }
 
 @Composable
