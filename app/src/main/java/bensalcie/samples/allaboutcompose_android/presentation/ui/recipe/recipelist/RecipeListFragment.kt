@@ -63,6 +63,7 @@ import androidx.lifecycle.lifecycleScope
 import bensalcie.samples.allaboutcompose_android.presentation.BaseApplication
 import bensalcie.samples.allaboutcompose_android.presentation.components.CircularIndeterminateProgressBar
 import bensalcie.samples.allaboutcompose_android.presentation.components.RecipeCard
+import bensalcie.samples.allaboutcompose_android.presentation.components.RecipeList
 import bensalcie.samples.allaboutcompose_android.presentation.components.SearchAppBar
 import bensalcie.samples.allaboutcompose_android.ui.theme.AllAboutComposeAndroidTheme
 import com.google.android.material.bottomnavigation.BottomNavigationItemView
@@ -205,47 +206,17 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
 //                        },
 
                     ) {
+                        //List bere.
+                        RecipeList(
+                            isLoading = isLoading,
+                            recipes = recipes ,
+                            onChangeRecipeScrollPosition = { viewModel.onQueryChange(query) },
+                            onTriggerEvent = {viewModel.onTriggerEvent(event =  RecipeListEvent.NextPageEvent)},
+                            page = page
+                        )
 
 
-                        Box(
-                            modifier = Modifier
-                                .padding(top = 130.dp)
-                                .fillMaxSize()
-                                .background(MaterialTheme.colorScheme.surface)
-                        ) {
-                            if (isLoading && recipes.isEmpty()) {
-                                LazyColumn {
 
-                                    /*
-                                  Lay down the Shimmer Animated item 5 time
-                                  [repeat] is like a loop which executes the body
-                                  according to the number specified
-                                */
-                                    repeat(5) {
-                                        item {
-                                            ShimmerCardLayout(cardHeight = 250.dp)
-                                        }
-                                    }
-                                }
-                            } else {
-
-
-                                LazyColumn {
-
-
-                                    itemsIndexed(items = recipes) {
-                                            index, item ->
-                                        viewModel.onChangeRecipeScrollPosition(index)
-                                        if((index+1)>=page* PAGE_SIZE &&!isLoading){
-                                            viewModel.onTriggerEvent(RecipeListEvent.NextPageEvent)
-                                        }
-                                        RecipeCard(recipe = item, onclick = {})
-                                    }
-
-                                }
-                            }
-
-                        }
                         CircularIndeterminateProgressBar(
                             isDisplayed = isLoading,
                             verticalBias = 0.3f
