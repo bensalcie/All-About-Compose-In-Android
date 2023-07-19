@@ -9,7 +9,7 @@
         android:name="bensalcie.samples.allaboutcompose_android.presentation.ui.recipe.recipelist.RecipeListFragment"
         android:label="RecipeListFragment" >
         <action
-            android:id="@+id/action_recipeListFragment_to_recipeFragment"
+            android:id="@+id/viewRecipe"
             app:destination="@id/recipeFragment" />
     </fragment>
 

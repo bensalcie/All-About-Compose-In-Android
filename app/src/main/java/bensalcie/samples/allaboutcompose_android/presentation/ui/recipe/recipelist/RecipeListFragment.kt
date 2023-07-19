@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import bensalcie.samples.allaboutcompose_android.presentation.BaseApplication
 import bensalcie.samples.allaboutcompose_android.presentation.components.CircularIndeterminateProgressBar
 import bensalcie.samples.allaboutcompose_android.presentation.components.RecipeCard
@@ -192,7 +193,7 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                                         snackbarHostState.showSnackbar(
                                             message = "Hurrey, you changed to $mode theme",
                                             actionLabel = "Dismiss",
-                                            duration = SnackbarDuration.Short
+                                            duration = SnackbarDuration.Short,
                                         )
                                     }
                                 }
@@ -212,7 +213,10 @@ class RecipeListFragment : androidx.fragment.app.Fragment() {
                             recipes = recipes ,
                             onChangeRecipeScrollPosition = { viewModel.onQueryChange(query) },
                             onTriggerEvent = {viewModel.onTriggerEvent(event =  RecipeListEvent.NextPageEvent)},
-                            page = page
+                            page = page,
+                            snackbarHostState= snackbarHostState,
+                            lifecycleScope = lifecycleScope,
+                            navController = findNavController()
                         )
 
 
